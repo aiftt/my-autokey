@@ -11,8 +11,14 @@ if !A_IsAdmin {
 ; 按下 ` 键切换开启/关闭循环点击：左键、左键、右键（重复）
 ; 可根据需要调整点击间隔（毫秒）
 global isRunning := false
-global nextStep := 1
-global clickInterval := 50  ; 每次点击之间的间隔，单位毫秒
+; 原 step 变量移除
+; global nextStep := 1
+; 新的序列控制变量
+global burstRunning := false
+global cycleInterval := 120  ; 每轮“左、左、右”序列的周期（毫秒）
+global perClickDelay := 30   ; 序列内每次点击之间的间隔（毫秒）
+
+; 指示器 GUI（置顶小方块显示 ON/OFF）
 global indicatorGui := Gui("+AlwaysOnTop -Caption +ToolWindow +E0x20")
 indicatorGui.MarginX := 0
 indicatorGui.MarginY := 0
@@ -23,27 +29,30 @@ indicatorGui.Show("x" (A_ScreenWidth//2 - 15) " y800 w30 h20 NoActivate")
 UpdateIndicator()
 
 SC029::{
-    global isRunning, nextStep, clickInterval
+    global isRunning, burstRunning, cycleInterval
     isRunning := !isRunning
     if (isRunning) {
-        nextStep := 1  ; 每次开启时从“左键、左键、右键”的第一步开始
-        SetTimer ClickRoutine, clickInterval
-        SoundBeep(1200, 120)  ; 开启提示音：高频短促
+        SetTimer BurstRoutine, cycleInterval
+        SoundBeep(1200, 120)
     } else {
-        SetTimer ClickRoutine, 0
-        SoundBeep(500, 150)   ; 关闭提示音：低频稍长
+        SetTimer BurstRoutine, 0
+        SoundBeep(500, 150)
     }
     UpdateIndicator()
 }
 
-ClickRoutine() {
-    global nextStep
-    if (nextStep <= 2) {
-        Send "r"
-    } else {
-        Send "t"
+BurstRoutine() {
+    global burstRunning, perClickDelay, isRunning
+    if (!isRunning || burstRunning) {
+        return
     }
-    nextStep := (nextStep = 3) ? 1 : (nextStep + 1)
+    burstRunning := true
+    Send "{LButton}"
+    Sleep(perClickDelay)
+    Send "{LButton}"
+    Sleep(perClickDelay)
+    Send "{RButton}"
+    burstRunning := false
 }
 
 UpdateIndicator() {
