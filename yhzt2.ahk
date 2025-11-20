@@ -28,8 +28,10 @@ SC029::{
     if (isRunning) {
         nextStep := 1  ; 每次开启时从“左键、左键、右键”的第一步开始
         SetTimer ClickRoutine, clickInterval
+        SoundBeep(1200, 120)  ; 开启提示音：高频短促
     } else {
         SetTimer ClickRoutine, 0
+        SoundBeep(500, 150)   ; 关闭提示音：低频稍长
     }
     UpdateIndicator()
 }
@@ -37,18 +39,11 @@ SC029::{
 ClickRoutine() {
     global nextStep
     if (nextStep <= 2) {
-        Click
+        Send "{LButton}"
     } else {
-        RightClick()
+        Send "{RButton}"
     }
     nextStep := (nextStep = 3) ? 1 : (nextStep + 1)
-}
-
-RightClick() {
-    ; 使用低级API注入右键（更容易被游戏识别）
-    DllCall("mouse_event", "UInt", 0x0008, "Int", 0, "Int", 0, "UInt", 0, "UInt", 0) ; 右键按下
-    Sleep 30
-    DllCall("mouse_event", "UInt", 0x0010, "Int", 0, "Int", 0, "UInt", 0, "UInt", 0) ; 右键释放
 }
 
 UpdateIndicator() {
