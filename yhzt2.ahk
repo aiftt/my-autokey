@@ -39,9 +39,9 @@ SC029::{
 ClickRoutine() {
     global nextStep
     if (nextStep <= 2) {
-        Send "{LButton}"
+        Send "r"
     } else {
-        Send "{RButton}"
+        Send "t"
     }
     nextStep := (nextStep = 3) ? 1 : (nextStep + 1)
 }
