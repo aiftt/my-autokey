@@ -4,7 +4,7 @@ SetWorkingDir A_ScriptDir
 SetTitleMatchMode 2
 
 global Toggle := false
-global ClickInterval := 60  ; 点击间隔（毫秒）
+global ClickInterval := 30  ; 点击间隔（毫秒）
 
 ; 指示器GUI
 global indicatorGui := Gui("+AlwaysOnTop -Caption +ToolWindow +E0x20")
@@ -41,7 +41,7 @@ AutoClickLoop() {
     }
     
     clickCount++
-    if (clickCount <= 2) {
+    if (clickCount <= 3) {
         Click("Left")  ; 左键
         UpdateIndicator(false, "左键" clickCount)
     } else {
@@ -55,13 +55,13 @@ AutoClickLoop() {
 UpdateIndicator(isRight := false, status := "") {
     global indicatorGui, indicatorText, Toggle
     if (Toggle) {
-        if (isRight) {
-            indicatorGui.BackColor := "Blue"
-            indicatorText.Value := status
-        } else {
-            indicatorGui.BackColor := "Green"
-            indicatorText.Value := status
-        }
+        ; if (isRight) {
+        ;     indicatorGui.BackColor := "Blue"
+        ;     indicatorText.Value := status
+        ; } else {
+        indicatorGui.BackColor := "Green"
+        indicatorText.Value := '开启'
+        ; }
     } else {
         indicatorGui.BackColor := "Gray"
         indicatorText.Value := "关闭"
