@@ -13,10 +13,10 @@ if !A_IsAdmin {
 global isRunning := false
 ; 原 step 变量移除
 ; global nextStep := 1
-; 新的序列控制变量
-global burstRunning := false
-global cycleInterval := 120  ; 每轮“左、左、右”序列的周期（毫秒）
-global perClickDelay := 30   ; 序列内每次点击之间的间隔（毫秒）
+; 新的序列控制变量（已简化，移除重入控制）
+; global burstRunning := false
+global cycleInterval := 60  ; 每轮发送“左、右”的周期（毫秒）
+global perClickDelay := 30   ; 左右之间的间隔（毫秒）
 
 ; 指示器 GUI（置顶小方块显示 ON/OFF）
 global indicatorGui := Gui("+AlwaysOnTop -Caption +ToolWindow +E0x20")
@@ -29,30 +29,27 @@ indicatorGui.Show("x" (A_ScreenWidth//2 - 15) " y800 w30 h20 NoActivate")
 UpdateIndicator()
 
 SC029::{
-    global isRunning, burstRunning, cycleInterval
+    global isRunning, cycleInterval
     isRunning := !isRunning
     if (isRunning) {
-        SetTimer BurstRoutine, cycleInterval
+        SetTimer SimpleRoutine, cycleInterval
         SoundBeep(1200, 120)
     } else {
-        SetTimer BurstRoutine, 0
+        SetTimer SimpleRoutine, 0
         SoundBeep(500, 150)
     }
     UpdateIndicator()
 }
 
-BurstRoutine() {
-    global burstRunning, perClickDelay, isRunning
-    if (!isRunning || burstRunning) {
+SimpleRoutine() {
+    global isRunning, perClickDelay
+    if (!isRunning) {
         return
     }
-    burstRunning := true
-    Send "{LButton}"
-    Sleep(perClickDelay)
     Send "{LButton}"
     Sleep(perClickDelay)
     Send "{RButton}"
-    burstRunning := false
+    Send "q"
 }
 
 UpdateIndicator() {
